@@ -1,6 +1,7 @@
 module Main where
 
 import Brick
+import Brick.Widgets.Border
 import Graphics.Vty.Attributes
 
 type AppState = Int
@@ -8,14 +9,21 @@ type AppState = Int
 app :: App AppState () String
 app =
   App
-  { appDraw = const []                          :: AppState -> [Widget String]
+  { appDraw = appDraw'
   , appChooseCursor =
       const . const Nothing                     :: AppState -> [CursorLocation String] -> Maybe (CursorLocation String)
   , appHandleEvent =
-      (\appState _ -> Brick.continue appState)  :: AppState -> BrickEvent String () -> EventM String (Next AppState)
+      (\appState _ -> Brick.halt appState)  :: AppState -> BrickEvent String () -> EventM String (Next AppState)
   , appStartEvent = return                      :: AppState -> EventM String AppState
   , appAttrMap = const (attrMap (defAttr) ([])) :: AppState -> AttrMap
   }
+
+appDraw' :: AppState -> [Widget String]
+appDraw' _ = [
+    (str "Hello," <=> str "World!" <=> hBorder)
+  , hBox [str "                                              Woohoo"]
+  ]
+
 
 main :: IO ()
 main = do
